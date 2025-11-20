@@ -159,7 +159,7 @@ jobs:
         run: |
           VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //')
           echo "Project version: $VERSION"
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create release
         id: create_release
@@ -183,6 +183,17 @@ jobs:
           asset_path: release_artifacts/windows-build/windows-build.zip
           asset_name: ReConRunner-Windows-${{ steps.get_version.outputs.version }}.zip
           asset_content_type: application/zip
+
+      - name: Upload Linux AppImage to Release
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release_artifacts/ReCon-latest-x86_64.AppImage/ReCon-latest-x86_64.AppImage
+          asset_name: ReConRunner-Linux-${{ steps.get_version.outputs.version }}.AppImage
+          asset_content_type: application/x-iso9660-image
       
       - name: Upload Android APK to Release
         id: upload-release-asset-android
